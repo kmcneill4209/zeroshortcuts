@@ -26,6 +26,7 @@ export default function AuthPage() {
   }, [user, loading, router]);
 
   const handleEmail = async () => {
+    if (!auth) { setError('Firebase not configured — add .env.local first.'); return; }
     setError('');
     setBusy(true);
     try {
@@ -43,6 +44,7 @@ export default function AuthPage() {
   };
 
   const handleGoogle = async () => {
+    if (!auth) { setError('Firebase not configured — add .env.local first.'); return; }
     setError('');
     setBusy(true);
     try {
