@@ -6,7 +6,13 @@ import { useRouter } from 'next/navigation';
 import { ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
-import { WorkoutLog } from '@/lib/types';
+import { Difficulty, WorkoutLog } from '@/lib/types';
+
+const difficultyLabel: Record<Difficulty, { text: string; cls: string }> = {
+  'too-hard': { text: '😓 Too Hard', cls: 'text-red-400 bg-red-400/10' },
+  'ok':       { text: '👌 Just Right', cls: 'text-emerald-400 bg-emerald-400/10' },
+  'too-easy': { text: '🔥 Too Easy', cls: 'text-amber-400 bg-amber-400/10' },
+};
 
 const dayTypeLabel: Record<string, string> = {
   arms: '💪 Arms',
@@ -61,10 +67,17 @@ function LogEntry({ log }: { log: WorkoutLog }) {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-white">{ex.exerciseName}</p>
-                    <p className="mt-0.5 text-xs text-neutral-500">
-                      {ex.sets} sets · {ex.reps} reps
-                      {ex.weight && ` · ${ex.weight}`}
-                    </p>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                      <p className="text-xs text-neutral-500">
+                        {ex.sets} sets · {ex.reps} reps
+                        {ex.weight && ` · ${ex.weight}`}
+                      </p>
+                      {ex.difficulty && difficultyLabel[ex.difficulty] && (
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${difficultyLabel[ex.difficulty].cls}`}>
+                          {difficultyLabel[ex.difficulty].text}
+                        </span>
+                      )}
+                    </div>
                     {ex.comment && (
                       <p className="mt-1.5 text-xs text-neutral-400 italic">"{ex.comment}"</p>
                     )}

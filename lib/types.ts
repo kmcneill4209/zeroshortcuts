@@ -40,6 +40,8 @@ export interface BlockPlan {
   days: DayPlan[];
 }
 
+export type Difficulty = 'too-easy' | 'ok' | 'too-hard';
+
 export interface ExerciseLog {
   exerciseId: string;
   exerciseName: string;
@@ -47,7 +49,16 @@ export interface ExerciseLog {
   reps: string;
   weight: string;
   comment: string;
+  difficulty?: Difficulty;
 }
+
+export interface ExerciseMemoryEntry {
+  lastWeight: string;
+  difficulty?: Difficulty;
+  lastLoggedAt: number;
+}
+
+export type ExerciseMemoryMap = Record<string, ExerciseMemoryEntry>;
 
 export interface WorkoutLog {
   id?: string;

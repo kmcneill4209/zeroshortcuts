@@ -6,6 +6,7 @@ import { CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { DayPlan, ExerciseLog, WorkoutExercise } from '@/lib/types';
 import { useAuth } from '@/hooks/useAuth';
+import { useExerciseMemory } from '@/hooks/useExerciseMemory';
 import ExerciseCard from './ExerciseCard';
 import LogModal from './LogModal';
 
@@ -17,6 +18,7 @@ interface Props {
 
 export default function WorkoutDayView({ day, block, weekInBlock }: Props) {
   const { user } = useAuth();
+  const { memory, updateMemory } = useExerciseMemory();
   const [exercises, setExercises] = useState<WorkoutExercise[]>(day.exercises);
   const [pendingLog, setPendingLog] = useState<WorkoutExercise | null>(null);
   const [logs, setLogs] = useState<ExerciseLog[]>([]);
@@ -39,6 +41,15 @@ export default function WorkoutDayView({ day, block, weekInBlock }: Props) {
       }
       return [...prev, log];
     });
+
+    // Persist weight + difficulty to exercise memory
+    if (log.weight) {
+      updateMemory(log.exerciseId, {
+        lastWeight: log.weight,
+        difficulty: log.difficulty,
+        lastLoggedAt: Date.now(),
+      });
+    }
   };
 
   const handleSaveWorkout = async () => {
@@ -98,6 +109,7 @@ export default function WorkoutDayView({ day, block, weekInBlock }: Props) {
               <ExerciseCard
                 workoutExercise={we}
                 allCurrentIds={allCurrentIds}
+                memoryEntry={memory[we.exercise.id]}
                 onLog={(we) => setPendingLog(we)}
                 onChange={handleChange}
               />
@@ -123,6 +135,7 @@ export default function WorkoutDayView({ day, block, weekInBlock }: Props) {
       {pendingLog && (
         <LogModal
           workoutExercise={pendingLog}
+          memoryEntry={memory[pendingLog.exercise.id]}
           onSave={handleLogSave}
           onClose={() => setPendingLog(null)}
         />

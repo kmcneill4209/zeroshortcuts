@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { RotateCcw, PlayCircle, ClipboardList } from 'lucide-react';
-import { WorkoutExercise, ExerciseCategory } from '@/lib/types';
+import { ExerciseCategory, ExerciseMemoryEntry, WorkoutExercise } from '@/lib/types';
 import { getAlternative } from '@/lib/exercises';
 
 const categoryColors: Record<ExerciseCategory, string> = {
@@ -19,12 +19,18 @@ const categoryColors: Record<ExerciseCategory, string> = {
 interface Props {
   workoutExercise: WorkoutExercise;
   allCurrentIds: string[];
+  memoryEntry?: ExerciseMemoryEntry;
   onLog: (we: WorkoutExercise) => void;
   onChange: (original: WorkoutExercise, replacement: WorkoutExercise) => void;
 }
 
-export default function ExerciseCard({ workoutExercise, allCurrentIds, onLog, onChange }: Props) {
-  const { exercise, sets, reps, suggestedWeight } = workoutExercise;
+export default function ExerciseCard({
+  workoutExercise,
+  allCurrentIds,
+  memoryEntry,
+  onLog,
+  onChange,
+}: Props) {
   const [current, setCurrent] = useState(workoutExercise);
   const [vetoed, setVetoed] = useState(false);
 
@@ -44,13 +50,21 @@ export default function ExerciseCard({ workoutExercise, allCurrentIds, onLog, on
   };
 
   const colorClass = categoryColors[current.exercise.category];
-  const label = current.exercise.category.charAt(0).toUpperCase() + current.exercise.category.slice(1);
+  const label =
+    current.exercise.category.charAt(0).toUpperCase() + current.exercise.category.slice(1);
+
+  const difficultyBadge =
+    memoryEntry?.difficulty === 'too-hard'
+      ? { text: '↓ Too hard last time', cls: 'text-red-400 bg-red-400/10' }
+      : memoryEntry?.difficulty === 'too-easy'
+      ? { text: '↑ Too easy last time', cls: 'text-amber-400 bg-amber-400/10' }
+      : null;
 
   return (
     <div className="group relative rounded-xl border border-white/5 bg-[#181818] p-4 transition-colors hover:border-white/10">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <div className="mb-1.5 flex items-center gap-2">
+          <div className="mb-1.5 flex flex-wrap items-center gap-2">
             <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colorClass}`}>
               {label}
             </span>
@@ -65,11 +79,16 @@ export default function ExerciseCard({ workoutExercise, allCurrentIds, onLog, on
                 Demo
               </a>
             )}
+            {difficultyBadge && (
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${difficultyBadge.cls}`}>
+                {difficultyBadge.text}
+              </span>
+            )}
           </div>
 
           <h3 className="font-medium text-white leading-snug">{current.exercise.name}</h3>
 
-          <div className="mt-2 flex items-center gap-3 text-sm text-neutral-400">
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-neutral-400">
             <span>{current.sets} sets</span>
             <span className="text-neutral-600">·</span>
             <span>{current.reps} reps</span>
@@ -77,6 +96,14 @@ export default function ExerciseCard({ workoutExercise, allCurrentIds, onLog, on
               <>
                 <span className="text-neutral-600">·</span>
                 <span>{current.suggestedWeight}</span>
+              </>
+            )}
+            {memoryEntry?.lastWeight && (
+              <>
+                <span className="text-neutral-600">·</span>
+                <span className="text-neutral-500 text-xs">
+                  Last: {memoryEntry.lastWeight}
+                </span>
               </>
             )}
           </div>

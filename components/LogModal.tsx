@@ -2,20 +2,52 @@
 
 import { useState } from 'react';
 import { X, Check } from 'lucide-react';
-import { WorkoutExercise, ExerciseLog } from '@/lib/types';
+import { Difficulty, ExerciseLog, ExerciseMemoryEntry, WorkoutExercise } from '@/lib/types';
+
+const DIFFICULTY_OPTIONS: {
+  value: Difficulty;
+  label: string;
+  emoji: string;
+  activeClass: string;
+}[] = [
+  {
+    value: 'too-hard',
+    label: 'Too Hard',
+    emoji: '😓',
+    activeClass: 'border-red-500/50 bg-red-500/15 text-red-400',
+  },
+  {
+    value: 'ok',
+    label: 'Just Right',
+    emoji: '👌',
+    activeClass: 'border-emerald-500/50 bg-emerald-500/15 text-emerald-400',
+  },
+  {
+    value: 'too-easy',
+    label: 'Too Easy',
+    emoji: '🔥',
+    activeClass: 'border-amber-500/50 bg-amber-500/15 text-amber-400',
+  },
+];
 
 interface Props {
   workoutExercise: WorkoutExercise;
+  memoryEntry?: ExerciseMemoryEntry;
   onSave: (log: ExerciseLog) => void;
   onClose: () => void;
 }
 
-export default function LogModal({ workoutExercise, onSave, onClose }: Props) {
+export default function LogModal({ workoutExercise, memoryEntry, onSave, onClose }: Props) {
   const { exercise, sets, reps, suggestedWeight } = workoutExercise;
+
+  // Prefer last-used weight over the program suggestion
+  const defaultWeight = memoryEntry?.lastWeight ?? suggestedWeight ?? '';
+
   const [actualSets, setActualSets] = useState(String(sets));
   const [actualReps, setActualReps] = useState(reps);
-  const [weight, setWeight] = useState(suggestedWeight ?? '');
+  const [weight, setWeight] = useState(defaultWeight);
   const [comment, setComment] = useState('');
+  const [difficulty, setDifficulty] = useState<Difficulty | undefined>(undefined);
 
   const handleSave = () => {
     onSave({
@@ -25,9 +57,13 @@ export default function LogModal({ workoutExercise, onSave, onClose }: Props) {
       reps: actualReps,
       weight,
       comment,
+      difficulty,
     });
     onClose();
   };
+
+  const showProgramHint =
+    suggestedWeight && memoryEntry?.lastWeight && memoryEntry.lastWeight !== suggestedWeight;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
@@ -77,6 +113,32 @@ export default function LogModal({ workoutExercise, onSave, onClose }: Props) {
               placeholder="e.g. 30 lbs, bodyweight"
               className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
             />
+            {showProgramHint && (
+              <p className="mt-1 text-[11px] text-neutral-600">
+                Program suggests {suggestedWeight}
+              </p>
+            )}
+          </div>
+
+          {/* Difficulty selector */}
+          <div>
+            <label className="mb-2 block text-xs text-neutral-500">How did it feel?</label>
+            <div className="grid grid-cols-3 gap-2">
+              {DIFFICULTY_OPTIONS.map(({ value, label, emoji, activeClass }) => (
+                <button
+                  key={value}
+                  onClick={() => setDifficulty(difficulty === value ? undefined : value)}
+                  className={`flex flex-col items-center gap-1 rounded-xl border py-3 text-xs font-medium transition-colors
+                    ${difficulty === value
+                      ? activeClass
+                      : 'border-white/10 bg-white/5 text-neutral-500 hover:bg-white/8 hover:text-neutral-300'
+                    }`}
+                >
+                  <span className="text-base leading-none">{emoji}</span>
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>
@@ -84,7 +146,7 @@ export default function LogModal({ workoutExercise, onSave, onClose }: Props) {
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="How did it feel? Too easy, too hard?"
+              placeholder="Any notes..."
               rows={2}
               className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
             />
