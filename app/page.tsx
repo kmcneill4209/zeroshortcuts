@@ -3,18 +3,12 @@
 import { useEffect, useState } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import { RefreshCw, ChevronRight } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
 import { getWeekPlan } from '@/lib/workoutProgram';
 import { WeekPlan } from '@/lib/types';
 import WorkoutDayView from '@/components/WorkoutDayView';
-
-const workoutTypeIcons: Record<string, string> = {
-  arms: '💪',
-  legs: '🦵',
-  'chest-back': '🏋️',
-};
 
 export default function HomePage() {
   const { user, loading } = useAuth();
