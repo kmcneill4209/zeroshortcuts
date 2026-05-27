@@ -7,7 +7,6 @@ import { ChevronRight } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
 import { getBlockPlan } from '@/lib/workoutProgram';
-import { BlockPlan } from '@/lib/types';
 import WorkoutDayView from '@/components/WorkoutDayView';
 
 export default function HomePage() {
@@ -25,8 +24,11 @@ export default function HomePage() {
   // Which block's week chips are showing in the bottom nav
   const [expandedBlock, setExpandedBlock] = useState(1);
 
-  const [plan, setPlan] = useState<BlockPlan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
+
+  // Derive plan directly — no async state update, no race condition.
+  // When selectedBlock changes this updates in the same render.
+  const plan = getBlockPlan(selectedBlock);
 
   useEffect(() => {
     if (!loading && !user) router.push('/auth');
@@ -44,15 +46,9 @@ export default function HomePage() {
       setSelectedBlock(b);
       setSelectedWeekInBlock(w);
       setExpandedBlock(b);
-      setPlan(getBlockPlan(b));
       setLoadingPlan(false);
     });
   }, [user]);
-
-  // Refresh plan when selected block changes
-  useEffect(() => {
-    setPlan(getBlockPlan(selectedBlock));
-  }, [selectedBlock]);
 
   const advanceWeek = async () => {
     if (!user) return;
@@ -100,7 +96,7 @@ export default function HomePage() {
     );
   }
 
-  if (!user || !plan) return null;
+  if (!user) return null;
 
   const isCurrentView =
     selectedBlock === currentBlock && selectedWeekInBlock === currentWeekInBlock;
@@ -136,7 +132,9 @@ export default function HomePage() {
       <div className="space-y-3">
         {plan.days.map((day) => (
           <WorkoutDayView
-            key={`${day.type}-${selectedBlock}-${selectedWeekInBlock}`}
+            // Key on block only — not week — so swaps persist across all 5
+            // weeks of a block. Changing block remounts with fresh exercises.
+            key={`${day.type}-${selectedBlock}`}
             day={day}
             block={selectedBlock}
             weekInBlock={selectedWeekInBlock}
