@@ -56,7 +56,7 @@ export default function HomePage() {
     let nextWeek = currentWeekInBlock + 1;
     if (nextWeek > 5) {
       nextWeek = 1;
-      nextBlock = currentBlock < 4 ? currentBlock + 1 : currentBlock;
+      nextBlock = currentBlock + 1; // no cap — program cycles every 12 blocks
     }
     setCurrentBlock(nextBlock);
     setCurrentWeekInBlock(nextWeek);
@@ -119,8 +119,7 @@ export default function HomePage() {
         {isCurrentView && (
           <button
             onClick={advanceWeek}
-            disabled={currentBlock === 4 && currentWeekInBlock === 5}
-            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/10 hover:text-white"
           >
             Next week
             <ChevronRight size={14} />
@@ -174,17 +173,18 @@ export default function HomePage() {
             })}
           </div>
 
-          {/* Block chips */}
+          {/* Block chips — shows last 4 unlocked blocks (all past blocks accessible via history) */}
           <div className="flex gap-2">
-            {[1, 2, 3, 4].map((b) => {
-              const unlocked = b <= currentBlock;
+            {(() => {
+              const numVisible = Math.min(currentBlock, 4);
+              const firstVisible = currentBlock - numVisible + 1;
+              return Array.from({ length: numVisible }, (_, i) => firstVisible + i);
+            })().map((b) => {
               const isExpanded = expandedBlock === b;
               const isCurrent = currentBlock === b;
-
               return (
                 <button
                   key={b}
-                  disabled={!unlocked}
                   onClick={() => handleBlockClick(b)}
                   className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition-colors
                     ${isExpanded && isCurrent
@@ -193,9 +193,7 @@ export default function HomePage() {
                       ? 'bg-white/15 text-white'
                       : isCurrent
                       ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400'
-                      : unlocked
-                      ? 'bg-white/8 text-neutral-400 hover:bg-white/12'
-                      : 'bg-white/3 text-neutral-700 cursor-not-allowed'
+                      : 'bg-white/8 text-neutral-400 hover:bg-white/12'
                     }`}
                 >
                   Block {b}
