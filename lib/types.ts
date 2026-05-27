@@ -35,8 +35,8 @@ export interface DayPlan {
   exercises: WorkoutExercise[];
 }
 
-export interface WeekPlan {
-  weekNumber: number; // 1–4 cycling
+export interface BlockPlan {
+  block: number; // 1–4
   days: DayPlan[];
 }
 
@@ -54,7 +54,13 @@ export interface WorkoutLog {
   userId: string;
   workoutType: WorkoutType;
   dayLabel: string;
-  weekNumber: number;
+  block: number;
+  weekInBlock: number;
   exercises: ExerciseLog[];
   completedAt: number;
+}
+
+export interface UserProgress {
+  block: number;       // 1–4
+  weekInBlock: number; // 1–5
 }

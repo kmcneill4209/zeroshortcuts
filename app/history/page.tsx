@@ -35,7 +35,9 @@ function LogEntry({ log }: { log: WorkoutLog }) {
             <span className="text-sm font-semibold text-white">
               {dayTypeLabel[log.workoutType] ?? log.dayLabel}
             </span>
-            <span className="text-xs text-neutral-500">Week {log.weekNumber}</span>
+            <span className="text-xs text-neutral-500">
+              Block {log.block} &middot; Wk {log.weekInBlock}
+            </span>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-neutral-500">
             <Calendar size={11} />

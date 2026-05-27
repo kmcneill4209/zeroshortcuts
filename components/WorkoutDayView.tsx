@@ -11,10 +11,11 @@ import LogModal from './LogModal';
 
 interface Props {
   day: DayPlan;
-  weekNumber: number;
+  block: number;
+  weekInBlock: number;
 }
 
-export default function WorkoutDayView({ day, weekNumber }: Props) {
+export default function WorkoutDayView({ day, block, weekInBlock }: Props) {
   const { user } = useAuth();
   const [exercises, setExercises] = useState<WorkoutExercise[]>(day.exercises);
   const [pendingLog, setPendingLog] = useState<WorkoutExercise | null>(null);
@@ -46,7 +47,8 @@ export default function WorkoutDayView({ day, weekNumber }: Props) {
       userId: user.uid,
       workoutType: day.type,
       dayLabel: day.label,
-      weekNumber,
+      block,
+      weekInBlock,
       exercises: logs,
       completedAt: Date.now(),
     });

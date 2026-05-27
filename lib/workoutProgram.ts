@@ -1,5 +1,5 @@
 import { exercises } from './exercises';
-import { DayPlan, WeekPlan, WorkoutExercise } from './types';
+import { BlockPlan, DayPlan, WorkoutExercise } from './types';
 
 function ex(id: string, overrides?: Partial<WorkoutExercise>): WorkoutExercise {
   const found = exercises.find((e) => e.id === id);
@@ -209,10 +209,10 @@ const chestBackDays: DayPlan[] = [
   },
 ];
 
-export function getWeekPlan(weekNumber: number): WeekPlan {
-  const idx = ((weekNumber - 1) % 4 + 4) % 4;
+export function getBlockPlan(block: number): BlockPlan {
+  const idx = ((block - 1) % 4 + 4) % 4;
   return {
-    weekNumber,
+    block,
     days: [armsDays[idx], legsDays[idx], chestBackDays[idx]],
   };
 }
