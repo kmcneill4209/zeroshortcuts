@@ -9,7 +9,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "ZeroShortcuts",
+  title: "WorkoutApp",
   description: "Your smart weekly workout planner",
 };
 

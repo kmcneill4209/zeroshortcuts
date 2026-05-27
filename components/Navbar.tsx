@@ -18,7 +18,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 text-white font-semibold tracking-tight">
           <Dumbbell size={18} className="text-emerald-400" />
-          <span>ZeroShortcuts</span>
+          <span>WorkoutApp</span>
         </Link>
 
         {user && (

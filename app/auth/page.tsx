@@ -68,7 +68,7 @@ export default function AuthPage() {
               <Dumbbell size={22} className="text-emerald-400" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-white">ZeroShortcuts</h1>
+          <h1 className="text-2xl font-bold text-white">WorkoutApp</h1>
           <p className="mt-1 text-sm text-neutral-500">Your weekly workout planner</p>
         </div>
 
