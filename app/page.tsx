@@ -75,7 +75,7 @@ export default function HomePage() {
 
       <div className="space-y-3">
         {plan.days.map((day) => (
-          <WorkoutDayView key={day.type} day={day} weekNumber={weekNumber} />
+          <WorkoutDayView key={`${day.type}-${weekNumber}`} day={day} weekNumber={weekNumber} />
         ))}
       </div>
 
